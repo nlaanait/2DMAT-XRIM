@@ -39,6 +39,7 @@ def build_crystal(layer_seq=OrderedDict(), substrate=None, mos2_layer=None, wse2
     return xu.simpack.LayerStack("stack_%s" % str(stack_name), eval(args))       
 
 def simFunc(x, *args, **kwargs):
+    # add a new parameter
     spacing_1, spacing_2, spacing_3, roughness, layer_occ_1, layer_occ_2, scale, q_offset, wse2_t, mos2_t = x
     layer_occ_1 = int(layer_occ_1)
     layer_occ_2 = int(layer_occ_2)
@@ -50,6 +51,7 @@ def simFunc(x, *args, **kwargs):
                           "layer_4": {"vacuum": spacing_3}, 
                           "layer_5": {"mos2": layer_occ_2}})
     # build film
+    #pass new params
     film = build_crystal(layer_seq=layer_dict, substrate=crystal_params[0], mos2_layer=crystal_params[1], 
                          wse2_layer=crystal_params[2], vacuum=crystal_params[3], stack_name="1_1_1", 
                          substrate_spacing=spacing_1, roughness=roughness, mos2_thickness=mos2_t, wse2_thickness=wse2_t)
@@ -79,12 +81,11 @@ def objFunc(x, *args, **kwargs):
         if np.isnan(fom): fom = 100.
         return fom
     
-def cluster_lscans(data_arr, num_cluster=8):
+def cluster_lscans(data_arr, num_clusters=8):
     data = np.copy(data_arr)
     data = data.transpose(1,2,0)
     orig_shape = data.shape
     data = data.reshape(-1, data.shape[-1])
-    num_clusters = 8
     # cluster data
     # kmeans_data = KMeans(n_clusters=num_clusters, n_jobs=-1, random_state=0)
     kmeans_data = MiniBatchKMeans(n_clusters=num_clusters, random_state=0) 
